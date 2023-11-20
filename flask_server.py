@@ -43,23 +43,18 @@ def slack_events():
             try:
                 print("Getting Summary")
 
-                # Remove Message from Message Table
-                ts = float(r.get("event").get('ts').strip(' "'))
-                user = r.get("event").get('user')
-                EvaDB.removeMessage(ts, user)
+                # client.chat_delete(channel=event["channel"], ts=event["event_ts"])
 
                 el = event.get("blocks")[0].get("elements")[0].get("elements")
-                # Check if the request is for general messages or a reset
+                # Check if the request is for general messages
                 if (len(el) == 2):
-                    num = el[1].get("text")
-                    if (num == " reset"):
-                        print("Test")
-                        EvaDB.reset()
-                        working = 0
-                        return "Sucsess"
-                    messages = EvaDB.getGeneralMessages(num[1])
+                    text = el[1].get("text")
+                    words = text.split()
+                    num = words[1]
+                    channel = words[0]
+                    messages = EvaDB.getGeneralMessages(num, channel)
                     response = client.chat_postMessage(
-    				    channel="testingbot",
+    				    channel=event["channel"],
     				    text="I am woking on the summary. It may take a few minutes for GPT4ALL to give a response.")
                     text  = ""
                     if (int(num[1]) > 1):
@@ -67,16 +62,17 @@ def slack_events():
                     else:
                         text = ChatBot.singleMessage(messages)
                     response = client.chat_postMessage(
-                        channel="testingbot",
+                        channel=event["channel"],
                         text="Summary: " + text)
                     print("Summary Done")
                 #Check if the request is for a spesific user
                 elif (len(el) == 4):
                     userid = el[2].get("user_id")
                     num = el[3].get("text")
-                    messages = EvaDB.getSingleUser(num[1], userid)
+                    channel = el[1].get("text")
+                    messages = EvaDB.getSingleUser(num[1], userid, channel[1:])
                     response = client.chat_postMessage(
-                        channel="testingbot",
+                        channel=event["channel"],
                         text="I am woking on the summary. It may take a few minutes for GPT4ALL to give a response.")
                     text  = ""
                     if (int(num[1]) > 1):
@@ -84,7 +80,7 @@ def slack_events():
                     else:
                         text = ChatBot.singleMessage(messages)
                     response = client.chat_postMessage(
-                        channel="testingbot",
+                        channel=event["channel"],
                         text="Summary: " + text)
                     print("Summary Done")
                 else:
@@ -92,7 +88,7 @@ def slack_events():
                     For getting a simgle users message use @BotName @User (num of responses wanted)
                     For getting the last x messages in chat use @BotName (num of responses wanted)"""
                     response = client.chat_postMessage(
-                        channel="testingbot",
+                        channel=event["channel"],
                         text="Error: " + text)
                 working = 0
             except Exception as e:
@@ -101,56 +97,14 @@ def slack_events():
                     For getting a simgle users message use @BotName @User (num of responses wanted)
                     For getting the last x messages in chat use @BotName (num of responses wanted)"""
                 response = client.chat_postMessage(
-                    channel="testingbot",
+                    channel=event["channel"],
                     text="Error: " + text)
                 working = 0
                 return "Sucsess"
         else:
             response = client.chat_postMessage(
-    				channel="testingbot",
+    				channel=event["channel"],
     				text="Sorry I am still working on the previous request")
-
-    
-    # Check if you are deleting a message to the message table
-    elif (event != None and event.get("type") == "message" and event.get("subtype") == "message_deleted"):
-        try:
-            print("Message Deleted")
-            ts = float(r.get("event").get("previous_message").get('ts').strip(' "'))
-            user = r.get("event").get("previous_message").get('user')
-            EvaDB.removeMessage(ts, user)
-        except Exception as e:
-            print(e)
-
-    # Check if a message has been edited 
-    elif (event != None and event.get("type") == "message" and event.get("subtype") == "message_changed"):
-        try:
-            print("Message Edited")
-            ts = float(r.get("event").get("previous_message").get("ts").strip(' "'))
-            user = r.get("event").get("previous_message").get("user")
-            mes = r.get("event").get("message").get("text")
-            phrase = ""
-            phrase = phrase + mes
-            mes = phrase.replace("'", "" )
-            EvaDB.removeMessage(ts, user)
-            EvaDB.addMessage(ts, user, mes)
-            # EvaDB.updateMessage(ts, user, mes)
-        except Exception as e:
-            print(e)
-
-    # Check if you are adding a message to the message table
-    elif (event != None and event.get("type") == "message" and event.get("subtype") == None):
-        print("Message Added")
-        try:
-            ts = float(r.get("event").get("ts").strip(' "'))
-            user = r.get("event").get("user")
-            mes = r.get("event").get("text")
-            phrase = ""
-            phrase = phrase + mes
-            mes = phrase.replace("'", "" )
-            if (user != EvaDB.BOT_ID):
-                EvaDB.addMessage(ts, user, mes)
-        except Exception as e:
-            print(e)
 
     return "Sucsess"
 
