@@ -19,7 +19,7 @@ def getSingleUser(num, user, channel):
     cursor.query("DROP DATABASE if exists slackTest;").execute()
 
     cursor.query("""CREATE DATABASE slackTest WITH ENGINE = 'slack', PARAMETERS = {
-        "token": "xoxb-5954206853489-5964598795008-q50q9gWVAQDPvhRXju1e2DIB",
+        "token": "{SLACK_TOKEN}",
         "channel": "C05U262RF4H"};""").execute()
     
     res = cursor.query(f"Select text, user from slackTest.{channel} where user = \"{user}\" LIMIT {num};").execute()
@@ -42,7 +42,7 @@ def getGeneralMessages(num, channel):
     cursor.query("DROP DATABASE if exists slackTest;").execute()
 
     cursor.query("""CREATE DATABASE slackTest WITH ENGINE = 'slack', PARAMETERS = {
-        "token": "xoxb-5954206853489-5964598795008-q50q9gWVAQDPvhRXju1e2DIB",
+        "token": "{SLACK_TOKEN}",
         "channel": "C05U262RF4H"};""").execute()
     
     res = cursor.query(f"Select text, user  from slackTest.{channel} LIMIT {num};").execute()
@@ -58,3 +58,5 @@ def getGeneralMessages(num, channel):
         Messagelist = Messagelist + x + "\n"
 
     return Messagelist
+
+test = getGeneralMessages(10, "testingbot2")
