@@ -16,9 +16,9 @@ Run flask_server.py to start the flask server and now it should be able to see y
 
 # How to Use
 ## General Messages
-If you just want the bot to summarize the last x messages in the chat you have to write the command as @bot_name x
-EX. I want to grab the last 5 messages from the chat (this excludes any bot messages): @Bot 5
+If you just want the bot to summarize the last x messages in the chat you have to write the command as @bot_name channel_name x
+EX. I want to grab the last 5 messages from the chat (this excludes any bot messages): @Bot general 5
 
 ## Messages from a Specific User
-If you just want the bot to summarize the last x messages sent by a specific user in the chat you have to write the command as @bot_name @user x
-EX. I want to grab the last message from a user @cm: @Bot @cm 1
+If you just want the bot to summarize the last x messages sent by a specific user in the chat you have to write the command as @bot_name channel_name @user x
+EX. I want to grab the last message from a user @cm: @Bot general @cm 1
