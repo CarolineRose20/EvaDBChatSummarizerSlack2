@@ -1,4 +1,4 @@
-# EvaDB-Project-1
+# EvaDB Slack Bot 2 Using EvaDBs Slack as a Data Source
 A Slack App that summarizes a single message or a group of messages on a single channel using EvaDB and GPT4ALL
 
 # Installation Guide
